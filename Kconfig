@@ -1,0 +1,17 @@
+config ZMK_XY_SNAP_IDLE_TIMEOUT_MS
+    int "XY Snap 無入力解除タイムアウト(ms)"
+    default 200
+    help
+      トラックボール停止後、軸固定を解除するまでの無入力時間（ミリ秒）。
+
+config ZMK_XY_SNAP_SWITCH_THRESHOLD
+    int "軸切り替え閾値"
+    default 20
+    help
+      軸固定中、反対軸方向への移動量がこの値を超えた場合のみ軸を切り替える。
+
+config ZMK_XY_SNAP_ALLOW_AXIS_SWITCH
+    bool "スクロール中の軸切り替えを許可"
+    default y
+    help
+      スクロール中に軸切り替えを許可するかどうか。nの場合、軸固定中は切り替え不可。 

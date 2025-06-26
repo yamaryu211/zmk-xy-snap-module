@@ -2,6 +2,7 @@
 #include <zmk/behavior.h>
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
+#include <stdlib.h>
 #include "xy_snap_input_processor.h"
 
 // Kconfigパラメータ取得（デフォルト値を設定）
@@ -96,6 +97,4 @@ int xy_snap_input_processor(struct zmk_input_event *event) {
         snap_state.last_move_time = now;
     }
     return 0;
-}
-
-ZMK_INPUT_PROCESSOR(xy_snap_input_processor); 
+} 

@@ -1,3 +1,5 @@
+menu "XY Snap Input Processor"
+
 config ZMK_XY_SNAP_IDLE_TIMEOUT_MS
     int "XY Snap 無入力解除タイムアウト(ms)"
     default 200
@@ -14,4 +16,6 @@ config ZMK_XY_SNAP_ALLOW_AXIS_SWITCH
     bool "スクロール中の軸切り替えを許可"
     default y
     help
-      スクロール中に軸切り替えを許可するかどうか。nの場合、軸固定中は切り替え不可。 
+      スクロール中に軸切り替えを許可するかどうか。nの場合、軸固定中は切り替え不可。
+
+endmenu 

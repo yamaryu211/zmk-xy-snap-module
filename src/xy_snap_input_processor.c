@@ -1,4 +1,3 @@
-#include <zmk/input.h>
 #include <zmk/event_manager.h>
 #include <zmk/behavior.h>
 #include <kernel.h>

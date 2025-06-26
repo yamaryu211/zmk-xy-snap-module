@@ -1,10 +1,6 @@
-#include <zmk/input.h>
-#include <zmk/event_manager.h>
-#include <zmk/behavior.h>
-#include <zmk/keymap.h>
 #include <zmk/input/processor.h>
-#include <device.h>
 #include <kernel.h>
+#include <device.h>
 #include "xy_snap_input_processor.h"
 
 // Kconfigパラメータ取得

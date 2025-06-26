@@ -52,9 +52,42 @@ CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH=y
 
 ## 使用方法
 
-1. west.yml に本モジュールを追加し、`west update`を実行
-2. `input-processors`に`xy_snap_input_processor`を指定
-3. 必要に応じて Kconfig でパラメータを上書き
+### 1. DTSI ファイルをインクルード
+
+keymap ファイル（例: `roBa.keymap`）の先頭に以下を追加：
+
+```dts
+#include <dts/xy_snap_input_processor.dtsi>
+```
+
+### 2. input-processors で指定
+
+trackball_listener の input-processors に追加：
+
+```dts
+trackball_listener {
+    status = "okay";
+    compatible = "zmk,input-listener";
+    device = <&trackball>;
+
+    input-processors = <&xy_snap_input_processor>;
+};
+```
+
+### 3. パラメータのカスタマイズ（オプション）
+
+DTSI ファイル内でパラメータを変更可能：
+
+```dts
+xy_snap_input_processor: xy_snap_input_processor {
+    compatible = "zmk,xy-snap-input-processor";
+    #input-processor-cells = <0>;
+
+    idle-timeout-ms = <300>;        // 300msに変更
+    switch-threshold = <15>;        // 15に変更
+    allow-axis-switch;              // 軸切り替え許可
+};
+```
 
 ## ライセンス
 

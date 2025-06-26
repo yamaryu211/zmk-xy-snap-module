@@ -2,7 +2,10 @@
 
 #include <zmk/event_manager.h>
 
-// 前方宣言
-struct zmk_input_event;
+// ZMK input-event構造体の定義
+struct zmk_input_event {
+    void *data;
+    // 他のメンバーは必要に応じて追加
+};
 
 int xy_snap_input_processor(struct zmk_input_event *event); 

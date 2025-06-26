@@ -1,7 +1,7 @@
 #include <zmk/event_manager.h>
 #include <zmk/behavior.h>
-#include <kernel.h>
-#include <device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
 #include "xy_snap_input_processor.h"
 
 // Kconfigパラメータ取得

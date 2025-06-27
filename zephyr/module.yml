@@ -1,3 +1,4 @@
 name: zmk-xy-snap-module
 build:
   cmake: .
+  dts_root: .

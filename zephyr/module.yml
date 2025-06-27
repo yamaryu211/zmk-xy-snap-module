@@ -1,4 +1,3 @@
-name: zmk_xy_snap_module
 build:
-  cmake-ext: True
-  kconfig-ext: True
+  cmake: .
+  kconfig: Kconfig

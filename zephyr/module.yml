@@ -4,3 +4,8 @@ build:
   kconfig: Kconfig
   depends:
     - zephyr
+    - zmk
+  settings:
+    ZMK_XY_SNAP_MODULE: y
+  cmake-args:
+    - -DZMK_XY_SNAP_MODULE=y

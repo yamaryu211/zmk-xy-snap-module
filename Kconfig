@@ -1,9 +1,17 @@
+# ZMK XY Snap Module
+config ZMK_XY_SNAP_MODULE
+    bool "ZMK XY Snap Module"
+    default y
+    depends on ZMK
+    help
+      ZMK XY Snap Moduleを有効にする
+
 menu "ZMK XY Snap Input Processor"
 
 config ZMK_XY_SNAP_INPUT_PROCESSOR
     bool "ZMK XY Snap Input Processor"
     default y
-    depends on ZMK
+    depends on ZMK_XY_SNAP_MODULE
     help
       XY軸ロック（スナップ）input-processorを有効にする
 

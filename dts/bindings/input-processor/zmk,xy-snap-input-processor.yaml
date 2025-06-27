@@ -22,10 +22,3 @@ properties:
     default: true
     description: |
       Whether to allow axis switching during scrolling. If false, axis remains locked until timeout.
-
-  # ZMK input-processorとして必要な設定
-  input-processor:
-    type: string
-    required: true
-    description: |
-      The input processor name for ZMK integration.

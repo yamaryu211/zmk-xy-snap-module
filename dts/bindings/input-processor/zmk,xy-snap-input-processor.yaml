@@ -1,0 +1,24 @@
+description: ZMK XY Snap Input Processor
+
+compatible: "zmk,xy-snap-input-processor"
+
+include: [base.yaml, input-processor.yaml]
+
+properties:
+  idle-timeout-ms:
+    type: int
+    default: 200
+    description: |
+      Timeout in milliseconds after which axis lock is released when no input is detected.
+
+  switch-threshold:
+    type: int
+    default: 20
+    description: |
+      Threshold value for switching locked axis when opposite axis movement exceeds this value.
+
+  allow-axis-switch:
+    type: boolean
+    default: true
+    description: |
+      Whether to allow axis switching during scrolling. If false, axis remains locked until timeout.

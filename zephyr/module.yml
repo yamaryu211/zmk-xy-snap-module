@@ -1,5 +1,4 @@
+name: zmk_xy_snap_module
 build:
-  cmake: .
-  kconfig: Kconfig
-  settings:
-    dts_root: .
+  cmake-ext: True
+  kconfig-ext: True

@@ -1,92 +1,80 @@
-# zmk-xy-snap-module
+# ZMK XY Snap Input Processor
 
-## 概要
+ZMK 用の XY 軸ロック（スナップ）input-processor モジュールです。
 
-トラックボールのスクロールを XY 軸いずれか一方向に固定し、斜め方向のスクロールを防止する ZMK 用 input-processor モジュールです。
+## 特徴
 
-## 主な機能
+- トラックボールやタッチパッドの XY 軸を自動でロックし、直線的なスクロールや操作を実現
+- デバイストリー（DTS）から柔軟に設定可能
+- ZMK 外部モジュールとして公式流儀で組み込み可能
 
-- 動き出し時に X/Y 軸の大きい方に軸固定
-- 軸固定中は他軸方向の移動を無視（または反対軸方向の移動量が閾値を超えた場合のみ軸切り替え可）
-- 停止後、一定時間（デフォルト 200ms）で軸固定解除
-- パラメータは zmk-config で設定可能
-- input-processors で指定可能
+## ディレクトリ構成
 
-## パラメータ（Kconfig で設定）
+```
+zmk-xy-snap-module/
+├── CMakeLists.txt
+├── Kconfig
+├── README.md
+├── dts/
+│   ├── xy_snap_input_processor.dtsi
+│   └── bindings/
+│       └── input-processor/
+│           └── zmk,xy-snap-input-processor.yaml
+├── include/
+│   └── zmk_xy_snap_input_processor.h
+├── src/
+│   └── zmk_xy_snap_input_processor.c
+└── zephyr/
+    └── module.yml
+```
 
-- `ZMK_XY_SNAP_IDLE_TIMEOUT_MS` : 無入力解除タイムアウト（デフォルト: 200ms）
-- `ZMK_XY_SNAP_SWITCH_THRESHOLD` : 軸切り替え閾値（デフォルト: 20）
-- `ZMK_XY_SNAP_ALLOW_AXIS_SWITCH` : 軸切り替え許可モード（デフォルト: 有効）
+## 導入方法
 
-## west.yml への追加例（zmk-config 側）
-
-zmk-config リポジトリの`west.yml`に以下を追加してください。
+### 1. west.yml に追加
 
 ```yaml
-manifest:
-  remotes:
-    - name: yamaryu211
-      url-base: https://github.com/yamaryu211
-  projects:
-    - name: zmk-xy-snap-module
-      remote: yamaryu211
-      revision: main
-      path: modules/zmk-xy-snap-module
-  self:
-    path: config
+- name: zmk-xy-snap-module
+  path: modules/zmk-xy-snap-module
+  url: <YOUR_REPO_URL>
+  revision: main
 ```
 
-追加後、以下のコマンドで取得できます。
+### 2. `zephyr/module.yml`で自動認識
 
-```sh
-west update
-```
+### 3. `-DZMK_EXTRA_MODULES=modules/zmk-xy-snap-module` をビルド時に指定
 
-## 設定例（zmk-config 側）
-
-```conf
-CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS=200
-CONFIG_ZMK_XY_SNAP_SWITCH_THRESHOLD=20
-CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH=y
-```
-
-## 使用方法
-
-### 1. DTSI ファイルをインクルード
-
-keymap ファイル（例: `roBa.keymap`）の先頭に以下を追加：
+### 4. devicetree で input-processor を有効化
 
 ```dts
-#include <dts/xy_snap_input_processor.dtsi>
-```
+#include <xy_snap_input_processor.dtsi>
 
-### 2. input-processors で指定
-
-trackball_listener の input-processors に追加：
-
-```dts
-trackball_listener {
-    status = "okay";
-    compatible = "zmk,input-listener";
-    device = <&trackball>;
-
+&trackball_listener {
     input-processors = <&xy_snap_input_processor>;
 };
 ```
 
-### 3. パラメータのカスタマイズ（オプション）
-
-DTSI ファイル内でパラメータを変更可能：
+## 設定例（DTSI）
 
 ```dts
 xy_snap_input_processor: xy_snap_input_processor {
     compatible = "zmk,xy-snap-input-processor";
     #input-processor-cells = <0>;
-
-    idle-timeout-ms = <300>;        // 300msに変更
-    switch-threshold = <15>;        // 15に変更
-    allow-axis-switch;              // 軸切り替え許可
+    idle-timeout-ms = <200>;
+    switch-threshold = <20>;
+    allow-axis-switch;
 };
+```
+
+## Kconfig オプション
+
+- `CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS` : ロック解除までの無入力時間（ms）
+- `CONFIG_ZMK_XY_SNAP_SWITCH_THRESHOLD` : 軸切り替えの閾値
+- `CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH` : 軸切り替え許可
+
+## ビルド例
+
+```sh
+west build -s zmk/app -b <board> -- -DZMK_EXTRA_MODULES=modules/zmk-xy-snap-module
 ```
 
 ## ライセンス

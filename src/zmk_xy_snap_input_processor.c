@@ -3,7 +3,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include <stdlib.h>
-#include "xy_snap_input_processor.h"
+#include "zmk_xy_snap_input_processor.h"
 
 // Kconfigパラメータ取得（デフォルト値を設定）
 #ifndef CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS

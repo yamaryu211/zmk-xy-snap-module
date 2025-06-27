@@ -46,7 +46,7 @@ zmk-xy-snap-module/
 ### 4. devicetree で input-processor を有効化
 
 ```dts
-#include <xy_snap_input_processor.dtsi>
+#include "../modules/zmk-xy-snap-module/dts/xy_snap_input_processor.dtsi"
 
 &trackball_listener {
     input-processors = <&xy_snap_input_processor>;

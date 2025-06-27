@@ -2,7 +2,7 @@ description: ZMK XY Snap Input Processor
 
 compatible: "zmk,xy-snap-input-processor"
 
-include: [base.yaml, input-processor.yaml]
+include: [base.yaml, zmk, input-processor.yaml]
 
 properties:
   idle-timeout-ms:

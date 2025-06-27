@@ -2,3 +2,5 @@ name: zmk-xy-snap-module
 build:
   cmake: .
   kconfig: Kconfig
+  depends:
+    - zephyr

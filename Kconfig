@@ -5,6 +5,25 @@ config ZMK_XY_SNAP_MODULE
     help
       ZMK XY Snap Moduleを有効にする
 
+choice ZMK_XY_SNAP_MODE
+    prompt "XY Snap Mode"
+    default ZMK_XY_SNAP_MODE_TRADITIONAL
+    depends on ZMK_XY_SNAP_MODULE
+    help
+      スクロールスナップの動作モードを選択
+
+config ZMK_XY_SNAP_MODE_TRADITIONAL
+    bool "Traditional Mode"
+    help
+      従来のxy_snap方式（動き出し方向で軸決定）
+
+config ZMK_XY_SNAP_MODE_KEYBALL
+    bool "Keyball Mode"
+    help
+      keyball方式（デフォルト縦軸固定 + 比率ベース切り替え）
+
+endchoice
+
 config ZMK_XY_SNAP_IDLE_TIMEOUT_MS
     int "XY Snap Idle Timeout (ms)"
     default 200
@@ -15,13 +34,27 @@ config ZMK_XY_SNAP_IDLE_TIMEOUT_MS
 config ZMK_XY_SNAP_SWITCH_THRESHOLD
     int "XY Snap Switch Threshold"
     default 20
-    depends on ZMK_XY_SNAP_MODULE
+    depends on ZMK_XY_SNAP_MODULE && ZMK_XY_SNAP_MODE_TRADITIONAL
     help
-      軸切り替えを許可する閾値
+      軸切り替えを許可する閾値（Traditional Mode用）
 
 config ZMK_XY_SNAP_ALLOW_AXIS_SWITCH
     bool "Allow Axis Switch"
     default y
-    depends on ZMK_XY_SNAP_MODULE
+    depends on ZMK_XY_SNAP_MODULE && ZMK_XY_SNAP_MODE_TRADITIONAL
     help
-      軸切り替えを許可するかどうか 
+      軸切り替えを許可するかどうか（Traditional Mode用）
+
+config ZMK_XY_SNAP_SWITCH_RATIO
+    int "XY Snap Switch Ratio (%)"
+    default 30
+    depends on ZMK_XY_SNAP_MODULE && ZMK_XY_SNAP_MODE_KEYBALL
+    help
+      横軸切り替えの閾値（縦軸に対する横軸の割合、%）（Keyball Mode用）
+
+config ZMK_XY_SNAP_CONTINUE_TIMEOUT_MS
+    int "XY Snap Continue Timeout (ms)"
+    default 1000
+    depends on ZMK_XY_SNAP_MODULE && ZMK_XY_SNAP_MODE_KEYBALL
+    help
+      停止後の軸継続期間（ミリ秒）（Keyball Mode用） 

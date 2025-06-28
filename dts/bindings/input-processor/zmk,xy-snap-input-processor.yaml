@@ -13,12 +13,24 @@ properties:
     type: int
     default: 20
     description: |
-      Threshold value for switching locked axis when opposite axis movement exceeds this value.
+      Threshold value for switching locked axis when opposite axis movement exceeds this value (Traditional Mode).
 
   allow-axis-switch:
     type: boolean
     description: |
-      Whether to allow axis switching during scrolling. If false, axis remains locked until timeout.
+      Whether to allow axis switching during scrolling. If false, axis remains locked until timeout (Traditional Mode).
+
+  switch-ratio:
+    type: int
+    default: 30
+    description: |
+      Threshold ratio (%) for switching to horizontal axis when horizontal movement exceeds this percentage of vertical movement (Keyball Mode).
+
+  continue-timeout-ms:
+    type: int
+    default: 1000
+    description: |
+      Timeout in milliseconds during which the previous axis lock is maintained after stopping (Keyball Mode).
 
   track-remainders:
     type: boolean

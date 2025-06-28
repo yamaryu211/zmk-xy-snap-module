@@ -2,7 +2,6 @@
 config ZMK_XY_SNAP_MODULE
     bool "ZMK XY Snap Module"
     default y
-    depends on ZMK
     help
       ZMK XY Snap Moduleを有効にする
 

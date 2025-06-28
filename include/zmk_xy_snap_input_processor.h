@@ -6,8 +6,10 @@
 // ZMK input-processor構造体の前方宣言
 struct zmk_input_processor;
 
-// ZMK input-processor API構造体の前方宣言
-struct zmk_input_processor_api;
+// ZMK input-processor API構造体の完全な定義
+struct zmk_input_processor_api {
+    int (*process)(struct zmk_input_processor *processor, void *event);
+};
 
 // ZMK input-event構造体の定義
 struct zmk_input_event {

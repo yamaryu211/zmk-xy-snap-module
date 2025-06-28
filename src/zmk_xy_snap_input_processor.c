@@ -90,12 +90,12 @@ int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
     return 0;
 }
 
-// 簡略化されたデバイス定義
+// 完全なAPI構造体の定義
 static const struct zmk_input_processor_api xy_snap_api = {
-    .process = zmk_xy_snap_input_processor_process,
+    .process = (int (*)(struct zmk_input_processor *, void *))zmk_xy_snap_input_processor_process,
 };
 
-// デバイス定義（簡略化版）
+// デバイス定義
 DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL,
                      POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
                      &xy_snap_api);

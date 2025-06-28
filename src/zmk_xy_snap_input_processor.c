@@ -170,11 +170,9 @@ static const struct zmk_input_processor_api xy_snap_api = {
     .process = (int (*)(struct zmk_input_processor *, void *))zmk_xy_snap_input_processor_process,
 };
 
-// デバイス定義 - 正しいノードラベルを使用
+// デバイス定義 - 条件付きコンパイルで安全に定義
 #ifdef DT_N_NODELABEL_xy_snap
-
-DEVICE_DT_DEFINE(DT_N_NODELABEL(xy_snap), NULL, NULL, NULL, NULL,
+DEVICE_DT_DEFINE(DT_NODELABEL(xy_snap), NULL, NULL, NULL, NULL,
                 POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
                 &xy_snap_api);
-
 #endif

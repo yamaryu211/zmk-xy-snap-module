@@ -3,9 +3,17 @@
         compatible = "zmk,xy-snap-input-processor";
         #input-processor-cells = <0>;
         
-        idle-timeout-ms = <200>;
+        // 共通パラメータ
+        idle-timeout-ms = <500>;
+        
+        // Traditional Mode用パラメータ
         switch-threshold = <20>;
         allow-axis-switch;
+        
+        // Keyball Mode用パラメータ
+        switch-ratio = <30>;
+        continue-timeout-ms = <1000>;
+        
         status = "okay";
     };
 }; 

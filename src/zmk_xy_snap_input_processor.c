@@ -2,8 +2,6 @@
 #include <zephyr/device.h>
 #include "zmk_xy_snap_input_processor.h"
 
-LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
-
 // Kconfigパラメータ取得（デフォルト値を設定）
 #ifndef CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS
 #define CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS 200
@@ -57,7 +55,6 @@ int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
         if (snap_state.axis_locked && (now - snap_state.last_move_time > XY_SNAP_IDLE_TIMEOUT_MS)) {
             snap_state.axis_locked = false;
             snap_state.locked_axis = 0;
-            LOG_DBG("Axis lock released due to timeout");
         }
         return 0;
     }
@@ -66,10 +63,8 @@ int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
     if (!snap_state.axis_locked) {
         if (abs(x) >= abs(y)) {
             snap_state.locked_axis = 1; // X軸固定
-            LOG_DBG("Axis locked to X");
         } else {
             snap_state.locked_axis = 2; // Y軸固定
-            LOG_DBG("Axis locked to Y");
         }
         snap_state.axis_locked = true;
         snap_state.last_move_time = now;
@@ -79,14 +74,12 @@ int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
             // Y方向の大きな動きで切り替え
             if (snap_state.allow_axis_switch && abs(y) > XY_SNAP_SWITCH_THRESHOLD) {
                 snap_state.locked_axis = 2;
-                LOG_DBG("Axis switched from X to Y");
             } else {
                 pointer_event->y = 0; // Y方向は無視
             }
         } else if (snap_state.locked_axis == 2) { // Y軸固定
             if (snap_state.allow_axis_switch && abs(x) > XY_SNAP_SWITCH_THRESHOLD) {
                 snap_state.locked_axis = 1;
-                LOG_DBG("Axis switched from Y to X");
             } else {
                 pointer_event->x = 0; // X方向は無視
             }

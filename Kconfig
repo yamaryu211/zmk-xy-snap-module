@@ -6,33 +6,33 @@ config ZMK_XY_SNAP_MODULE
     help
       ZMK XY Snap Moduleを有効にする
 
-menu "ZMK XY Snap Input Processor"
+menu "ZMK XY Snap Input Behavior"
 
-config ZMK_XY_SNAP_INPUT_PROCESSOR
-    bool "ZMK XY Snap Input Processor"
+config ZMK_XY_SNAP_INPUT_BEHAVIOR
+    bool "ZMK XY Snap Input Behavior Listener"
     default y
-    depends on ZMK_XY_SNAP_MODULE
+    depends on ZMK
     help
-      XY軸ロック（スナップ）input-processorを有効にする
+      ZMK XY Snap Input Behavior Listenerを有効にする
 
 config ZMK_XY_SNAP_IDLE_TIMEOUT_MS
     int "XY Snap Idle Timeout (ms)"
     default 200
-    depends on ZMK_XY_SNAP_INPUT_PROCESSOR
+    depends on ZMK_XY_SNAP_INPUT_BEHAVIOR
     help
       無入力で軸ロックを解除するまでのタイムアウト（ミリ秒）
 
 config ZMK_XY_SNAP_SWITCH_THRESHOLD
     int "XY Snap Switch Threshold"
     default 20
-    depends on ZMK_XY_SNAP_INPUT_PROCESSOR
+    depends on ZMK_XY_SNAP_INPUT_BEHAVIOR
     help
       軸切り替えを許可する閾値
 
 config ZMK_XY_SNAP_ALLOW_AXIS_SWITCH
     bool "Allow Axis Switch"
     default y
-    depends on ZMK_XY_SNAP_INPUT_PROCESSOR
+    depends on ZMK_XY_SNAP_INPUT_BEHAVIOR
     help
       軸切り替えを許可するかどうか
 

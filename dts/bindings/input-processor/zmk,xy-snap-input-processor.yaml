@@ -20,6 +20,12 @@ properties:
     description: |
       Whether to allow axis switching during scrolling. If false, axis remains locked until timeout.
 
+  min-move-threshold:
+    type: int
+    default: 5
+    description: |
+      Minimum movement threshold for axis selection.
+
   track-remainders:
     type: boolean
     description: |

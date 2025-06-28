@@ -22,7 +22,7 @@ zmk-xy-snap-module/
 │           └── zmk,xy-snap-input-processor.yaml
 ├── include/
 │   └── zmk_xy_snap_input_processor.h
-├── src/
+├── behaviors/
 │   └── zmk_xy_snap_input_processor.c
 └── zephyr/
     └── module.yml

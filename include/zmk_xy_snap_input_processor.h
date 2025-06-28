@@ -2,6 +2,7 @@
 #define ZMK_XY_SNAP_INPUT_PROCESSOR_H
 
 #include <zephyr/kernel.h>
+#include <zephyr/drivers/input.h>
 
 // ZMK input-processor構造体の前方宣言
 struct zmk_input_processor;

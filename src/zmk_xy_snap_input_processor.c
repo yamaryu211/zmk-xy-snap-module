@@ -1,6 +1,5 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
-#include <zephyr/drivers/input.h>
 #include <stdlib.h>
 #include "zmk_xy_snap_input_processor.h"
 
@@ -91,18 +90,12 @@ int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
     return 0;
 }
 
-// Zephyrデバイスドライバーの実装
-static int xy_snap_input_processor_init(const struct device *dev) {
-    // 初期化処理
-    return 0;
-}
-
-// デバイスドライバーAPI
-static const struct input_processor_api xy_snap_input_processor_api = {
+// 簡略化されたデバイス定義
+static const struct zmk_input_processor_api xy_snap_api = {
     .process = zmk_xy_snap_input_processor_process,
 };
 
-// デバイス定義
-DEVICE_DT_INST_DEFINE(0, xy_snap_input_processor_init, NULL, NULL, NULL,
-                     POST_KERNEL, CONFIG_INPUT_INIT_PRIORITY,
-                     &xy_snap_input_processor_api);
+// デバイス定義（簡略化版）
+DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL,
+                     POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
+                     &xy_snap_api);

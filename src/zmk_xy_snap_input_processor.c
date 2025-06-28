@@ -1,7 +1,5 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
-#include <zmk/input/input_listener.h>
-#include <zmk/input/input_processor.h>
 #include "zmk_xy_snap_input_processor.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);

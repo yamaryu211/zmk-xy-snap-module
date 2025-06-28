@@ -1,6 +1,5 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
-#include <zmk/input/processor.h>
 #include <zmk/events.h>
 #include <zmk/event_manager.h>
 #include <zmk/input/input.h>

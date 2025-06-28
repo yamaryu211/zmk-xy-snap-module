@@ -2,7 +2,7 @@
 #define ZMK_XY_SNAP_INPUT_PROCESSOR_H
 
 #include <zephyr/kernel.h>
-#include <zmk/input/processor.h>
+#include <zmk/input/input_processor.h>
 
 // ZMK input-event構造体の定義
 struct zmk_input_event {

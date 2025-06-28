@@ -97,6 +97,10 @@ static const struct zmk_input_processor_api xy_snap_api = {
 };
 
 // デバイス定義 - 正しいノードラベルを使用
+#ifdef DT_N_NODELABEL_xy_snap
+
 DEVICE_DT_DEFINE(DT_NODELABEL(xy_snap), NULL, NULL, NULL, NULL,
-                 POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
-                 &xy_snap_api);
+                POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
+                &xy_snap_api);
+
+#endif

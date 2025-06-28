@@ -6,9 +6,6 @@
 // ZMK input-processor構造体の前方宣言
 struct zmk_input_processor;
 
-// ZMK input-processor API構造体の前方宣言
-struct zmk_input_processor_api;
-
 // ZMK input-event構造体の定義
 struct zmk_input_event {
     void *data;
@@ -30,14 +27,5 @@ int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
 
 // イベントタイプの定義
 #define ZMK_INPUT_EVENT_POINTER 1
-
-// API登録マクロの定義
-#define ZMK_INPUT_PROCESSOR_API_DEFINE(name, func) \
-    static const struct zmk_input_processor_api name##_api = { \
-        .process = func, \
-    }; \
-    DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, \
-                         POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY, \
-                         &name##_api)
 
 #endif // ZMK_XY_SNAP_INPUT_PROCESSOR_H

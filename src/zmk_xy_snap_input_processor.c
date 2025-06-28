@@ -89,12 +89,3 @@ int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
     }
     return 0;
 }
-
-// ZMK input-processor APIの登録（簡略化版）
-static const struct zmk_input_processor_api xy_snap_api = {
-    .process = zmk_xy_snap_input_processor_process,
-};
-
-DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL,
-                     POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
-                     &xy_snap_api);

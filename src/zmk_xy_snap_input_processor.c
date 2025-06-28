@@ -1,5 +1,6 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
+#include <zephyr/devicetree.h>
 #include <stdlib.h>
 #include "zmk_xy_snap_input_processor.h"
 
@@ -95,7 +96,7 @@ static const struct zmk_input_processor_api xy_snap_api = {
     .process = (int (*)(struct zmk_input_processor *, void *))zmk_xy_snap_input_processor_process,
 };
 
-// デバイス定義
-DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL,
-                     POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
-                     &xy_snap_api);
+// デバイス定義 - 正しいノードに対応
+DEVICE_DT_DEFINE(DT_NODELABEL(xy_snap_input_processor), NULL, NULL, NULL, NULL,
+                 POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
+                 &xy_snap_api);

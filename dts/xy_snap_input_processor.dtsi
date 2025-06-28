@@ -6,5 +6,6 @@
         idle-timeout-ms = <200>;
         switch-threshold = <20>;
         allow-axis-switch;
+        status = "okay";
     };
 }; 

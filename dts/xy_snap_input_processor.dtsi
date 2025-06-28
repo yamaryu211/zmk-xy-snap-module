@@ -1,5 +1,5 @@
 / {
-    xy_snap_input_processor: xy_snap_input_processor {
+    xy_snap: xy_snap {
         compatible = "zmk,xy-snap-input-processor";
         #input-processor-cells = <0>;
         

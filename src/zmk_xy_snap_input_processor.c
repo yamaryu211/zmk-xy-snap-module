@@ -2,6 +2,7 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <stdlib.h>
+#include <math.h>
 #include "zmk_xy_snap_input_processor.h"
 
 // Kconfigパラメータ取得（デフォルト値を設定）
@@ -17,9 +18,14 @@
 #define CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH 0
 #endif
 
+#ifndef CONFIG_ZMK_XY_SNAP_MIN_MOVE_THRESHOLD
+#define CONFIG_ZMK_XY_SNAP_MIN_MOVE_THRESHOLD 5
+#endif
+
 #define XY_SNAP_IDLE_TIMEOUT_MS CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS
 #define XY_SNAP_SWITCH_THRESHOLD CONFIG_ZMK_XY_SNAP_SWITCH_THRESHOLD
 #define XY_SNAP_ALLOW_AXIS_SWITCH CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH
+#define XY_SNAP_MIN_MOVE_THRESHOLD CONFIG_ZMK_XY_SNAP_MIN_MOVE_THRESHOLD
 
 // 状態管理用構造体
 struct xy_snap_state {
@@ -39,6 +45,35 @@ static struct xy_snap_state snap_state = {
 // pointerイベントか判定
 static bool is_pointer_event(struct zmk_input_event *event) {
     return event && event->type == ZMK_INPUT_EVENT_POINTER;
+}
+
+// 移動ベクトルベースの軸選択
+static int determine_axis_from_vector(int x, int y) {
+    // 最小移動量のチェック
+    double magnitude = sqrt(x*x + y*y);
+    if (magnitude < XY_SNAP_MIN_MOVE_THRESHOLD) {
+        return 0; // 移動量が小さすぎる場合は軸選択しない
+    }
+    
+    // 移動ベクトルの角度を計算（ラジアン）
+    double angle = atan2(y, x);
+    
+    // 角度を度数法に変換
+    double degrees = angle * 180.0 / M_PI;
+    
+    // 角度を正規化（0〜360°）
+    if (degrees < 0) {
+        degrees += 360;
+    }
+    
+    // 軸選択の判定
+    // 水平方向: 0°〜45°、315°〜360°
+    // 垂直方向: 45°〜315°
+    if ((degrees >= 0 && degrees <= 45) || (degrees >= 315 && degrees <= 360)) {
+        return 1; // X軸固定
+    } else {
+        return 2; // Y軸固定
+    }
 }
 
 int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
@@ -61,15 +96,14 @@ int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
         return 0;
     }
 
-    // 軸未固定→動き出し方向で軸固定
+    // 軸未固定→移動ベクトルで軸固定
     if (!snap_state.axis_locked) {
-        if (abs(x) >= abs(y)) {
-            snap_state.locked_axis = 1; // X軸固定
-        } else {
-            snap_state.locked_axis = 2; // Y軸固定
+        int selected_axis = determine_axis_from_vector(x, y);
+        if (selected_axis > 0) {
+            snap_state.locked_axis = selected_axis;
+            snap_state.axis_locked = true;
+            snap_state.last_move_time = now;
         }
-        snap_state.axis_locked = true;
-        snap_state.last_move_time = now;
     } else {
         // 軸固定中
         if (snap_state.locked_axis == 1) { // X軸固定

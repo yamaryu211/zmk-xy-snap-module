@@ -2,8 +2,15 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <stdlib.h>
-#include <math.h>
 #include "zmk_xy_snap_input_processor.h"
+
+// 数学ライブラリの使用を選択
+#ifdef CONFIG_ZMK_XY_SNAP_USE_MATH_LIB
+#include <math.h>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+#endif
 
 // Kconfigパラメータ取得（デフォルト値を設定）
 #ifndef CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS
@@ -47,7 +54,8 @@ static bool is_pointer_event(struct zmk_input_event *event) {
     return event && event->type == ZMK_INPUT_EVENT_POINTER;
 }
 
-// 移動ベクトルベースの軸選択
+#ifdef CONFIG_ZMK_XY_SNAP_USE_MATH_LIB
+// 数学ライブラリを使用した高精度な軸選択
 static int determine_axis_from_vector(int x, int y) {
     // 最小移動量のチェック
     double magnitude = sqrt(x*x + y*y);
@@ -75,6 +83,45 @@ static int determine_axis_from_vector(int x, int y) {
         return 2; // Y軸固定
     }
 }
+#else
+// 簡易的な平方根計算（整数用）
+static int sqrt_int(int x) {
+    if (x <= 0) return 0;
+    if (x == 1) return 1;
+    
+    int result = 1;
+    int i = 1;
+    while (i * i <= x) {
+        result = i;
+        i++;
+    }
+    return result;
+}
+
+// 軽量な軸選択（整数演算のみ）
+static int determine_axis_from_vector(int x, int y) {
+    // 最小移動量のチェック（整数平方根を使用）
+    int magnitude_squared = x*x + y*y;
+    int magnitude = sqrt_int(magnitude_squared);
+    if (magnitude < XY_SNAP_MIN_MOVE_THRESHOLD) {
+        return 0; // 移動量が小さすぎる場合は軸選択しない
+    }
+    
+    // 移動ベクトルの角度を計算（簡易版）
+    // atan2の代わりに、xとyの比率を使用
+    int abs_x = abs(x);
+    int abs_y = abs(y);
+    
+    // 角度の判定（45度 = 1:1の比率）
+    // 水平方向: |x| >= |y|
+    // 垂直方向: |y| > |x|
+    if (abs_x >= abs_y) {
+        return 1; // X軸固定
+    } else {
+        return 2; // Y軸固定
+    }
+}
+#endif
 
 int zmk_xy_snap_input_processor_process(struct zmk_input_processor *processor,
                                        struct zmk_input_event *event) {

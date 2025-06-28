@@ -1,5 +1,5 @@
-#ifndef ZMK_XY_SNAP_INPUT_PROCESSOR
-#define ZMK_XY_SNAP_INPUT_PROCESSOR
+#ifndef ZMK_XY_SNAP_INPUT_PROCESSOR_H
+#define ZMK_XY_SNAP_INPUT_PROCESSOR_H
 
 #include <zephyr/kernel.h>
 #include <zmk/input/processor.h>

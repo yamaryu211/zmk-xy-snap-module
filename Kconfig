@@ -7,21 +7,32 @@ config ZMK_XY_SNAP_MODULE
 
 config ZMK_XY_SNAP_IDLE_TIMEOUT_MS
     int "XY Snap Idle Timeout (ms)"
-    default 200
+    default 300
     depends on ZMK_XY_SNAP_MODULE
     help
       無入力で軸ロックを解除するまでのタイムアウト（ミリ秒）
+      iPhone風の挙動のため、より長いタイムアウトを推奨
 
 config ZMK_XY_SNAP_SWITCH_THRESHOLD
     int "XY Snap Switch Threshold"
-    default 20
+    default 50
     depends on ZMK_XY_SNAP_MODULE
     help
       軸切り替えを許可する閾値
+      iPhone風の挙動のため、より高い閾値を推奨
+
+config ZMK_XY_SNAP_INITIAL_THRESHOLD
+    int "XY Snap Initial Threshold"
+    default 10
+    depends on ZMK_XY_SNAP_MODULE
+    help
+      初期方向決定のための累積移動量の閾値
+      この値以上動いた方向に軸がロックされる
 
 config ZMK_XY_SNAP_ALLOW_AXIS_SWITCH
     bool "Allow Axis Switch"
-    default y
+    default n
     depends on ZMK_XY_SNAP_MODULE
     help
-      軸切り替えを許可するかどうか 
+      軸切り替えを許可するかどうか
+      iPhone風の挙動のため、無効にすることを推奨 

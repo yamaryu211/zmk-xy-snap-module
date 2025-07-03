@@ -11,20 +11,25 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 // Kconfigパラメータ取得
 #ifndef CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS
-#define CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS 200
+#define CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS 300
 #endif
 
 #ifndef CONFIG_ZMK_XY_SNAP_SWITCH_THRESHOLD
-#define CONFIG_ZMK_XY_SNAP_SWITCH_THRESHOLD 20
+#define CONFIG_ZMK_XY_SNAP_SWITCH_THRESHOLD 50
 #endif
 
 #ifndef CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH
-#define CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH 1
+#define CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH 0
+#endif
+
+#ifndef CONFIG_ZMK_XY_SNAP_INITIAL_THRESHOLD
+#define CONFIG_ZMK_XY_SNAP_INITIAL_THRESHOLD 10
 #endif
 
 #define XY_SNAP_IDLE_TIMEOUT_MS CONFIG_ZMK_XY_SNAP_IDLE_TIMEOUT_MS
 #define XY_SNAP_SWITCH_THRESHOLD CONFIG_ZMK_XY_SNAP_SWITCH_THRESHOLD
 #define XY_SNAP_ALLOW_AXIS_SWITCH CONFIG_ZMK_XY_SNAP_ALLOW_AXIS_SWITCH
+#define XY_SNAP_INITIAL_THRESHOLD CONFIG_ZMK_XY_SNAP_INITIAL_THRESHOLD
 
 // 状態管理用構造体
 struct xy_snap_state {
@@ -32,8 +37,9 @@ struct xy_snap_state {
     bool allow_axis_switch;
     int locked_axis; // 0:未固定, 1:X, 2:Y
     int64_t last_move_time;
-    int pending_x;
-    int pending_y;
+    int accumulated_x;
+    int accumulated_y;
+    bool initial_direction_determined;
 };
 
 static struct xy_snap_state snap_state = {
@@ -41,8 +47,9 @@ static struct xy_snap_state snap_state = {
     .allow_axis_switch = XY_SNAP_ALLOW_AXIS_SWITCH,
     .locked_axis = 0,
     .last_move_time = 0,
-    .pending_x = 0,
-    .pending_y = 0,
+    .accumulated_x = 0,
+    .accumulated_y = 0,
+    .initial_direction_determined = false,
 };
 
 // input-behavior APIの実装
@@ -52,13 +59,13 @@ int zmk_xy_snap_input_behavior_binding_pressed(struct zmk_behavior_binding *bind
     snap_state.axis_locked = true;
     snap_state.last_move_time = k_uptime_get();
     
-    // 最初の動きで軸を決定
-    if (abs(snap_state.pending_x) >= abs(snap_state.pending_y)) {
+    // 累積値で初期方向を決定
+    if (abs(snap_state.accumulated_x) >= abs(snap_state.accumulated_y)) {
         snap_state.locked_axis = 1; // X軸固定
-        LOG_DBG("Axis locked to X");
+        LOG_DBG("Axis locked to X (accumulated: x=%d, y=%d)", snap_state.accumulated_x, snap_state.accumulated_y);
     } else {
         snap_state.locked_axis = 2; // Y軸固定
-        LOG_DBG("Axis locked to Y");
+        LOG_DBG("Axis locked to Y (accumulated: x=%d, y=%d)", snap_state.accumulated_x, snap_state.accumulated_y);
     }
     
     return ZMK_BEHAVIOR_OPAQUE;
@@ -69,8 +76,9 @@ int zmk_xy_snap_input_behavior_binding_released(struct zmk_behavior_binding *bin
     // 軸ロックを解除
     snap_state.axis_locked = false;
     snap_state.locked_axis = 0;
-    snap_state.pending_x = 0;
-    snap_state.pending_y = 0;
+    snap_state.accumulated_x = 0;
+    snap_state.accumulated_y = 0;
+    snap_state.initial_direction_determined = false;
     LOG_DBG("Axis lock released");
     
     return ZMK_BEHAVIOR_OPAQUE;
@@ -93,16 +101,44 @@ int zmk_xy_snap_input_listener_callback(struct zmk_input_listener *listener,
         if (snap_state.axis_locked && (now - snap_state.last_move_time > XY_SNAP_IDLE_TIMEOUT_MS)) {
             snap_state.axis_locked = false;
             snap_state.locked_axis = 0;
+            snap_state.accumulated_x = 0;
+            snap_state.accumulated_y = 0;
+            snap_state.initial_direction_determined = false;
             LOG_DBG("Axis lock released due to timeout");
         }
         return 0;
     }
 
-    // 軸固定中の処理
-    if (snap_state.axis_locked) {
+    // 軸未固定→初期方向の決定
+    if (!snap_state.axis_locked) {
+        snap_state.accumulated_x += x;
+        snap_state.accumulated_y += y;
+        
+        // 初期方向の決定（累積値で判定）
+        if (!snap_state.initial_direction_determined) {
+            if (abs(snap_state.accumulated_x) >= XY_SNAP_INITIAL_THRESHOLD || 
+                abs(snap_state.accumulated_y) >= XY_SNAP_INITIAL_THRESHOLD) {
+                
+                if (abs(snap_state.accumulated_x) >= abs(snap_state.accumulated_y)) {
+                    snap_state.locked_axis = 1; // X軸固定
+                } else {
+                    snap_state.locked_axis = 2; // Y軸固定
+                }
+                snap_state.initial_direction_determined = true;
+                snap_state.axis_locked = true;
+                snap_state.last_move_time = now;
+                LOG_DBG("Initial direction determined: %s (accumulated: x=%d, y=%d)", 
+                       snap_state.locked_axis == 1 ? "X" : "Y", 
+                       snap_state.accumulated_x, snap_state.accumulated_y);
+            }
+        }
+    } else {
+        // 軸固定中の処理
         if (snap_state.locked_axis == 1) { // X軸固定
             if (snap_state.allow_axis_switch && abs(y) > XY_SNAP_SWITCH_THRESHOLD) {
                 snap_state.locked_axis = 2;
+                snap_state.accumulated_x = 0;
+                snap_state.accumulated_y = y;
                 LOG_DBG("Axis switched from X to Y");
             } else {
                 pointer_event->y = 0; // Y方向は無視
@@ -110,6 +146,8 @@ int zmk_xy_snap_input_listener_callback(struct zmk_input_listener *listener,
         } else if (snap_state.locked_axis == 2) { // Y軸固定
             if (snap_state.allow_axis_switch && abs(x) > XY_SNAP_SWITCH_THRESHOLD) {
                 snap_state.locked_axis = 1;
+                snap_state.accumulated_x = x;
+                snap_state.accumulated_y = 0;
                 LOG_DBG("Axis switched from Y to X");
             } else {
                 pointer_event->x = 0; // X方向は無視

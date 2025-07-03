@@ -3,9 +3,10 @@
         compatible = "zmk,xy-snap-input-processor";
         #input-processor-cells = <0>;
         
-        idle-timeout-ms = <200>;
-        switch-threshold = <20>;
-        allow-axis-switch;
+        idle-timeout-ms = <300>;
+        switch-threshold = <50>;
+        initial-threshold = <10>;
+        // allow-axis-switch;
         status = "okay";
     };
 }; 

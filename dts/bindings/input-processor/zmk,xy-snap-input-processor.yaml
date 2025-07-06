@@ -1,5 +1,7 @@
 description: ZMK XY Snap Input Processor - iPhone-style directional lock
 
+include: ["input-processor.yaml"]
+
 compatible: "zmk,xy-snap-input-processor"
 
 properties:

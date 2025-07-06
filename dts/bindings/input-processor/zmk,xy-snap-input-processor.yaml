@@ -25,10 +25,8 @@ properties:
 
   allow-axis-switch:
     type: boolean
-    default: false
     description: Whether to allow axis switching during scrolling
 
   track-remainders:
     type: boolean
-    default: true
     description: Whether to track remainder values for smooth scrolling

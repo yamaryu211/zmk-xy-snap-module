@@ -2,10 +2,17 @@ description: ZMK XY Snap Input Processor - iPhone-style directional lock
 
 compatible: "zmk,xy-snap-input-processor"
 
+"#input-processor-cells":
+  type: int
+  const: 0
+  description: Number of cells required in the input processor specifier
+
 properties:
   idle-timeout-ms:
     type: int
     default: 300
+    minimum: 0
+    maximum: 65535
     description: |
       Timeout in milliseconds after which axis lock is released when no input is detected.
       Longer timeout for more stable iPhone-like behavior.
@@ -13,6 +20,8 @@ properties:
   switch-threshold:
     type: int
     default: 50
+    minimum: 0
+    maximum: 32767
     description: |
       Threshold value for switching locked axis when opposite axis movement exceeds this value.
       Higher threshold prevents accidental axis switching.
@@ -20,6 +29,8 @@ properties:
   initial-threshold:
     type: int
     default: 10
+    minimum: 0
+    maximum: 32767
     description: |
       Threshold value for determining initial scroll direction.
       Accumulated movement must exceed this value to lock axis.
@@ -36,8 +47,3 @@ properties:
     default: true
     description: |
       Whether to track remainder values for smooth scrolling.
-
-"#input-processor-cells":
-  type: int
-  default: 0
-  description: Number of cells required in the input processor specifier

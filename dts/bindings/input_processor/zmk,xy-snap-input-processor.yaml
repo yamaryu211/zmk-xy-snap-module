@@ -1,0 +1,36 @@
+description: ZMK XY Snap Input Processor
+
+compatible: "zmk,xy-snap-input-processor"
+
+properties:
+  idle-timeout-ms:
+    type: int
+    default: 300
+    description: |
+      Timeout in milliseconds after which the axis lock is reset.
+      When no input is received for this duration, the processor
+      will reset and allow new axis locking.
+
+  switch-threshold:
+    type: int
+    default: 50
+    description: |
+      Threshold for switching between locked axes when allow-axis-switch
+      is enabled. Movement must exceed this value on the non-locked axis
+      to trigger a switch.
+
+  initial-threshold:
+    type: int
+    default: 10
+    description: |
+      Initial threshold for determining which axis to lock.
+      The first movement that exceeds this value will determine
+      which axis gets locked.
+
+  allow-axis-switch:
+    type: boolean
+    default: false
+    description: |
+      Whether to allow switching between locked axes during operation.
+      When enabled, strong movement on the non-locked axis can cause
+      the lock to switch to that axis.

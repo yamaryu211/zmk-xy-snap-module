@@ -2,11 +2,6 @@ description: ZMK XY Snap Input Processor - iPhone-style directional lock
 
 compatible: "zmk,xy-snap-input-processor"
 
-"#input-processor-cells":
-  type: int
-  default: 0
-  description: Number of cells in input-processor specifier
-
 properties:
   idle-timeout-ms:
     type: int

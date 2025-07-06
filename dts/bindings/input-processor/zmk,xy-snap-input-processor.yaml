@@ -26,11 +26,18 @@ properties:
 
   allow-axis-switch:
     type: boolean
+    default: false
     description: |
       Whether to allow axis switching during scrolling. 
       For iPhone-like behavior, set to false or omit this property.
 
   track-remainders:
     type: boolean
+    default: true
     description: |
       Whether to track remainder values for smooth scrolling.
+
+"#input-processor-cells":
+  type: int
+  default: 0
+  description: Number of cells required in the input processor specifier

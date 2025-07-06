@@ -1,8 +1,5 @@
 #include <zephyr/kernel.h>
-#include <zephyr/device.h>
 #include <zmk/input/input_behavior.h>
-#include <zmk/events.h>
-#include <zmk/event_manager.h>
 #include <zmk/input/input.h>
 #include "zmk_xy_snap_input_behavior.h"
 

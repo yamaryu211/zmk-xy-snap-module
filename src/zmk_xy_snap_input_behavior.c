@@ -1,11 +1,14 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/dt-bindings/input/input-event-codes.h>
-#include <zmk/input/input.h>
 #include <zmk/input/input_processor.h>
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
+
+// Input event constants (from linux/input-event-codes.h)
+#define INPUT_EV_REL 0x02
+#define INPUT_REL_X  0x00
+#define INPUT_REL_Y  0x01
 
 // XY Snap input processor state
 struct xy_snap_state {

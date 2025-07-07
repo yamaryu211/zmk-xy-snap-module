@@ -50,17 +50,14 @@ static void xy_snap_reset_state(const struct device *dev) {
     }
 }
 
-static int xy_snap_handle_event(const struct device *dev, struct input_event *event,
-                                uint32_t param1, uint32_t param2,
-                                struct input_event **result_events, int *result_events_len) {
+static void xy_snap_input_handler(const struct device *dev, struct input_event *event) {
     const struct xy_snap_config *config = dev->config;
     struct xy_snap_data *data = dev->data;
     
     if (event->type != INPUT_EV_REL) {
         // REL以外のイベントはそのまま次のprocessorに渡す
-        *result_events = event;
-        *result_events_len = 1;
-        return 0;
+        input_report_abs(dev, event->code, event->value, event->sync, K_FOREVER);
+        return;
     }
     
     int64_t now = k_uptime_get();
@@ -81,9 +78,8 @@ static int xy_snap_handle_event(const struct device *dev, struct input_event *ev
         dy = event->value;
     } else {
         // X/Y以外のRELイベントはそのまま次のprocessorに渡す
-        *result_events = event;
-        *result_events_len = 1;
-        return 0;
+        input_report_rel(dev, event->code, event->value, event->sync, K_FOREVER);
+        return;
     }
     
     // 余りを加算
@@ -147,35 +143,19 @@ static int xy_snap_handle_event(const struct device *dev, struct input_event *ev
         }
     }
     
-    // 結果イベントの作成
-    static struct input_event output_events[2];
-    int event_count = 0;
-    
+    // 結果イベントの送信
     if (output_x != 0) {
-        output_events[event_count].type = INPUT_EV_REL;
-        output_events[event_count].code = INPUT_REL_X;
-        output_events[event_count].value = output_x;
-        output_events[event_count].sync = false;
-        event_count++;
+        input_report_rel(dev, INPUT_REL_X, output_x, false, K_FOREVER);
     }
     
     if (output_y != 0) {
-        output_events[event_count].type = INPUT_EV_REL;
-        output_events[event_count].code = INPUT_REL_Y;
-        output_events[event_count].value = output_y;
-        output_events[event_count].sync = false;
-        event_count++;
+        input_report_rel(dev, INPUT_REL_Y, output_y, false, K_FOREVER);
     }
     
     // syncイベントの処理
-    if (event->sync && event_count > 0) {
-        output_events[event_count - 1].sync = true;
+    if (event->sync) {
+        input_report_rel(dev, INPUT_REL_X, 0, true, K_FOREVER);
     }
-    
-    *result_events = output_events;
-    *result_events_len = event_count;
-    
-    return 0;
 }
 
 static int xy_snap_init(const struct device *dev) {
@@ -187,9 +167,7 @@ static int xy_snap_init(const struct device *dev) {
     return 0;
 }
 
-static const struct input_processor_driver_api xy_snap_driver_api = {
-    .handle_event = xy_snap_handle_event,
-};
+INPUT_CALLBACK_DEFINE(NULL, xy_snap_input_handler);
 
 #define XY_SNAP_INIT(inst)                                                                         \
     static const struct xy_snap_config xy_snap_config_##inst = {                                  \
@@ -204,6 +182,6 @@ static const struct input_processor_driver_api xy_snap_driver_api = {
                                                                                                    \
     DEVICE_DT_INST_DEFINE(inst, xy_snap_init, NULL, &xy_snap_data_##inst,                       \
                           &xy_snap_config_##inst, POST_KERNEL, CONFIG_INPUT_INIT_PRIORITY,       \
-                          &xy_snap_driver_api);
+                          NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(XY_SNAP_INIT) 

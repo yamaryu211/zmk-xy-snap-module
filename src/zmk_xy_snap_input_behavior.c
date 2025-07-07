@@ -12,10 +12,6 @@
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-// INPUT_REL_Xとinput_REL_Yの定義
-#define INPUT_REL_X 0x00
-#define INPUT_REL_Y 0x01
-
 // 設定構造体の定義
 struct xy_snap_config {
     int32_t idle_timeout_ms;
@@ -37,6 +33,11 @@ struct xy_snap_data {
     int32_t remainder_y;
 };
 
+// input processorのAPI構造体
+struct input_processor_driver_api {
+    int (*process)(const struct device *dev, struct input_event *event);
+};
+
 static void xy_snap_reset_state(struct xy_snap_data *data) {
     data->accumulated_x = 0;
     data->accumulated_y = 0;
@@ -47,13 +48,13 @@ static void xy_snap_reset_state(struct xy_snap_data *data) {
     data->remainder_y = 0;
 }
 
-static void xy_snap_callback(const struct device *dev, struct input_event *evt) {
+static int xy_snap_process(const struct device *dev, struct input_event *evt) {
     const struct xy_snap_config *config = dev->config;
     struct xy_snap_data *data = dev->data;
     
     // 相対位置イベントのみ処理
     if (evt->type != INPUT_EV_REL) {
-        return;
+        return 0;
     }
     
     // タイムアウト処理
@@ -70,7 +71,7 @@ static void xy_snap_callback(const struct device *dev, struct input_event *evt) 
     } else if (evt->code == INPUT_REL_Y) {
         data->accumulated_y += abs(evt->value);
     } else {
-        return;
+        return 0;
     }
     
     // 初期軸の決定
@@ -105,7 +106,13 @@ static void xy_snap_callback(const struct device *dev, struct input_event *evt) 
             }
         }
     }
+    
+    return 0;
 }
+
+static const struct input_processor_driver_api xy_snap_driver_api = {
+    .process = xy_snap_process,
+};
 
 static int xy_snap_init(const struct device *dev) {
     struct xy_snap_data *data = dev->data;
@@ -125,6 +132,6 @@ static int xy_snap_init(const struct device *dev) {
     DEVICE_DT_INST_DEFINE(inst, xy_snap_init, NULL,                          \
                           &xy_snap_data_##inst, &xy_snap_config_##inst,       \
                           POST_KERNEL, CONFIG_INPUT_INIT_PRIORITY,             \
-                          NULL);
+                          &xy_snap_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(XY_SNAP_INIT) 

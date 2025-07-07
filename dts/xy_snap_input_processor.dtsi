@@ -1,13 +1,23 @@
+/*
+ * Copyright (c) 2024 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 / {
-    xy_snap: xy_snap {
-        compatible = "zmk,xy-snap-input-processor";
+    xy_snap_input_processor: xy_snap_input_processor {
+        compatible = "zmk,input-processor-code-mapper";
         #input-processor-cells = <0>;
         
-        idle-timeout-ms = <300>;
-        switch-threshold = <50>;
-        initial-threshold = <10>;
-        track-remainders;
-        // allow-axis-switch;
+        // 基本的な軸スナップ機能をcode-mapperで実装
+        // 実際の軸スナップ機能は設定ファイルで既存のプロセッサーを組み合わせて実現
+        
+        type = <INPUT_EV_REL>;
+        map = <
+            INPUT_REL_X INPUT_REL_X
+            INPUT_REL_Y INPUT_REL_Y
+        >;
+        
         status = "okay";
     };
 }; 

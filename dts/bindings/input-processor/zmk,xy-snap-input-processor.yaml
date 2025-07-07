@@ -33,3 +33,10 @@ properties:
       Whether to allow switching between locked axes during operation.
       When enabled, strong movement on the non-locked axis can cause
       the lock to switch to that axis.
+
+  track-remainders:
+    type: boolean
+    description: |
+      Whether to track sub-pixel movement remainders for more precise
+      input processing. When enabled, fractional movement values are
+      accumulated and applied when they exceed integer thresholds.

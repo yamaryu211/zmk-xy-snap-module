@@ -1,24 +1,16 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
+#include <zephyr/devicetree.h>
 #include <zephyr/input/input.h>
-#include <drivers/input_processor.h>
+#include <zephyr/logging/log.h>
+#include <zmk/input_processor.h>
+
+LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 // Input event constants (from linux/input-event-codes.h)
 #define INPUT_EV_REL 0x02
 #define INPUT_REL_X  0x00
 #define INPUT_REL_Y  0x01
-
-// XY Snap input processor state
-struct xy_snap_state {
-    int64_t last_activity_time;
-    bool axis_locked;
-    bool x_axis_locked;
-    bool y_axis_locked;
-    bool allow_axis_switch;
-    int32_t switch_threshold;
-    int32_t idle_timeout_ms;
-    int32_t initial_threshold;
-};
 
 // XY Snap input processor configuration
 struct xy_snap_config {
@@ -26,6 +18,14 @@ struct xy_snap_config {
     int32_t switch_threshold;
     int32_t initial_threshold;
     bool allow_axis_switch;
+};
+
+// XY Snap input processor state
+struct xy_snap_state {
+    int64_t last_activity_time;
+    bool axis_locked;
+    bool x_axis_locked;
+    bool y_axis_locked;
 };
 
 // XY Snap input processor data
@@ -105,11 +105,6 @@ static int xy_snap_process(const struct device *dev, struct input_event *event,
     return 0;
 }
 
-// Input processor API
-static const struct input_processor_api xy_snap_api = {
-    .process = xy_snap_process,
-};
-
 // Device tree configuration parsing
 static int xy_snap_init(const struct device *dev) {
     struct xy_snap_data *data = dev->data;
@@ -132,8 +127,7 @@ static int xy_snap_init(const struct device *dev) {
         .initial_threshold = DT_INST_PROP_OR(n, initial_threshold, 10),     \
         .allow_axis_switch = DT_INST_PROP(n, allow_axis_switch),            \
     };                                                                       \
-    DEVICE_DT_INST_DEFINE(n, xy_snap_init, NULL, &xy_snap_data_##n,        \
-                          &xy_snap_config_##n, POST_KERNEL,                 \
-                          CONFIG_INPUT_PROCESSOR_INIT_PRIORITY, &xy_snap_api);
+    ZMK_INPUT_PROCESSOR_DEFINE(n, xy_snap_init, &xy_snap_data_##n,          \
+                              &xy_snap_config_##n, xy_snap_process);
 
 DT_INST_FOREACH_STATUS_OKAY(XY_SNAP_INST) 

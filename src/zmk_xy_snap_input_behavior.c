@@ -34,14 +34,17 @@ struct xy_snap_data {
     bool initial_direction_set;
 };
 
-static void xy_snap_reset_state(struct xy_snap_data *data) {
+static void xy_snap_reset_state(const struct device *dev) {
+    const struct xy_snap_config *config = dev->config;
+    struct xy_snap_data *data = dev->data;
+    
     data->axis_locked = false;
     data->x_axis_locked = false;
     data->y_axis_locked = false;
     data->accumulated_x = 0;
     data->accumulated_y = 0;
     data->initial_direction_set = false;
-    if (!data->track_remainders) {
+    if (!config->track_remainders) {
         data->remainder_x = 0;
         data->remainder_y = 0;
     }
@@ -62,7 +65,7 @@ static void xy_snap_input_handler(const struct device *dev, struct input_event *
     // タイムアウトチェック
     if (config->idle_timeout_ms > 0 && 
         (now - data->last_activity_time) > config->idle_timeout_ms) {
-        xy_snap_reset_state(data);
+        xy_snap_reset_state(dev);
     }
     
     data->last_activity_time = now;
@@ -159,7 +162,7 @@ static int xy_snap_init(const struct device *dev) {
     struct xy_snap_data *data = dev->data;
     
     data->last_activity_time = k_uptime_get();
-    xy_snap_reset_state(data);
+    xy_snap_reset_state(dev);
     
     return 0;
 }

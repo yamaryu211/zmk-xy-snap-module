@@ -29,7 +29,6 @@ properties:
 
   allow-axis-switch:
     type: boolean
-    default: false
     description: |
       Whether to allow switching between locked axes during operation.
       When enabled, strong movement on the non-locked axis can cause

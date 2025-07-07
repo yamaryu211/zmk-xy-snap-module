@@ -1,6 +1,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
-#include <zmk/input/input_processor.h>
+#include <zephyr/input/input.h>
+#include <drivers/input_processor.h>
 
 // Input event constants (from linux/input-event-codes.h)
 #define INPUT_EV_REL 0x02

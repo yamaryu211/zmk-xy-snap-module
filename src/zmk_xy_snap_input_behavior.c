@@ -1,9 +1,5 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
-#include <zephyr/logging/log.h>
-#include <zmk/input/input_processor.h>
-
-LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 // Input event constants (from linux/input-event-codes.h)
 #define INPUT_EV_REL 0x02
@@ -56,7 +52,6 @@ static int xy_snap_process(const struct device *dev, struct input_event *event,
         state->axis_locked = false;
         state->x_axis_locked = false;
         state->y_axis_locked = false;
-        LOG_DBG("XY Snap: Axis lock reset due to timeout");
     }
     
     // Determine axis lock if not already locked
@@ -70,11 +65,9 @@ static int xy_snap_process(const struct device *dev, struct input_event *event,
             if (abs_x > abs_y) {
                 state->x_axis_locked = true;
                 state->y_axis_locked = false;
-                LOG_DBG("XY Snap: X axis locked");
             } else {
                 state->x_axis_locked = false;
                 state->y_axis_locked = true;
-                LOG_DBG("XY Snap: Y axis locked");
             }
             state->axis_locked = true;
         }
@@ -90,11 +83,9 @@ static int xy_snap_process(const struct device *dev, struct input_event *event,
         if (state->x_axis_locked && abs_y > config->switch_threshold) {
             state->x_axis_locked = false;
             state->y_axis_locked = true;
-            LOG_DBG("XY Snap: Switched to Y axis");
         } else if (state->y_axis_locked && abs_x > config->switch_threshold) {
             state->x_axis_locked = true;
             state->y_axis_locked = false;
-            LOG_DBG("XY Snap: Switched to X axis");
         }
     }
     
@@ -127,7 +118,6 @@ static int xy_snap_init(const struct device *dev) {
     data->state.x_axis_locked = false;
     data->state.y_axis_locked = false;
     
-    LOG_DBG("XY Snap input processor initialized");
     return 0;
 }
 

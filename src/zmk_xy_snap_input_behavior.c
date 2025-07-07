@@ -11,7 +11,6 @@
 #include <stdlib.h>
 
 #include <zmk/event_manager.h>
-#include <zmk/events/mouse_move.h>
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 

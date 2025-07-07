@@ -8,6 +8,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/input/input.h>
 #include <zephyr/logging/log.h>
+#include <stdlib.h>
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -46,7 +47,7 @@ static void xy_snap_reset_state(struct xy_snap_data *data) {
     data->remainder_y = 0;
 }
 
-static void xy_snap_callback(struct input_event *evt, const struct device *dev) {
+static void xy_snap_callback(const struct device *dev, struct input_event *evt) {
     const struct xy_snap_config *config = dev->config;
     struct xy_snap_data *data = dev->data;
     
@@ -112,10 +113,6 @@ static int xy_snap_init(const struct device *dev) {
     return 0;
 }
 
-static const struct input_callback_api xy_snap_callback_api = {
-    .callback = xy_snap_callback,
-};
-
 #define XY_SNAP_INIT(inst)                                                     \
     static struct xy_snap_data xy_snap_data_##inst = {0};                      \
     static const struct xy_snap_config xy_snap_config_##inst = {               \
@@ -128,6 +125,6 @@ static const struct input_callback_api xy_snap_callback_api = {
     DEVICE_DT_INST_DEFINE(inst, xy_snap_init, NULL,                          \
                           &xy_snap_data_##inst, &xy_snap_config_##inst,       \
                           POST_KERNEL, CONFIG_INPUT_INIT_PRIORITY,             \
-                          &xy_snap_callback_api);
+                          NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(XY_SNAP_INIT) 

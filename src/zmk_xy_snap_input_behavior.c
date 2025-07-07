@@ -172,16 +172,16 @@ static int xy_snap_init(const struct device *dev) {
         .idle_timeout_ms = DT_INST_PROP_OR(inst, idle_timeout_ms, 0),                            \
         .switch_threshold = DT_INST_PROP_OR(inst, switch_threshold, 50),                         \
         .initial_threshold = DT_INST_PROP_OR(inst, initial_threshold, 10),                       \
-        .allow_axis_switch = DT_INST_PROP(inst, allow_axis_switch),                              \
-        .track_remainders = DT_INST_PROP(inst, track_remainders),                                \
+        .allow_axis_switch = DT_INST_PROP_OR(inst, allow_axis_switch, false),                    \
+        .track_remainders = DT_INST_PROP_OR(inst, track_remainders, false),                      \
     };                                                                                             \
                                                                                                    \
     static struct xy_snap_data xy_snap_data_##inst;                                               \
                                                                                                    \
-    INPUT_CALLBACK_DEFINE(NULL, xy_snap_input_handler);                                           \
+    INPUT_CALLBACK_DEFINE(DEVICE_DT_GET(DT_DRV_INST(inst)), xy_snap_input_handler);             \
                                                                                                    \
     DEVICE_DT_INST_DEFINE(inst, xy_snap_init, NULL, &xy_snap_data_##inst,                       \
                           &xy_snap_config_##inst, POST_KERNEL, CONFIG_INPUT_INIT_PRIORITY,       \
-                          &input_api);
+                          NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(XY_SNAP_INIT) 

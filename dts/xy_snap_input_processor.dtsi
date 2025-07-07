@@ -6,6 +6,7 @@
         idle-timeout-ms = <300>;
         switch-threshold = <50>;
         initial-threshold = <10>;
+        track-remainders;
         // allow-axis-switch;
         status = "okay";
     };
